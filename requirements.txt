@@ -1,0 +1,2 @@
+chronos-forecasting -> library to work with time series data and forecasting created by Amazon
+pandas -> library to work with dataframes and time series data
