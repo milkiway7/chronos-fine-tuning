@@ -29,9 +29,6 @@ class candles_repository():
                     candles_table.CloseTime >= start_timestamp
                 ).order_by(candles_table.CloseTime.asc()).limit(items_num)
                 
-                if interval == "30m":
-                    a =1
-
                 result = await session.execute(query)
                 candles = result.scalars().all()
                 return candles

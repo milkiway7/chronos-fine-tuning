@@ -18,6 +18,9 @@ class candle_data_processor:
         for interval in INTERVALS:
             oldest_candle = await self.repository.get_oldest_candle_for_interval(interval)
             start_time = oldest_candle.CloseTime
+
+            df_parts = []
+
             while True:
                 candles = await self.repository.get_candles_by_symbol_timestamp(interval, start_time, self.batch_size)
                 if not candles:
@@ -26,10 +29,16 @@ class candle_data_processor:
                 
                 df = self.to_dataframe(candles)
                 df = self.transform_data(df)
-
-                self.save_to_parquet(df, interval, start_time)
+                df_parts.append(df)
+                
                 # Take timestamp from the newest + 1 ms to avoid duplicates
                 start_time = candles[-1].CloseTime + 1
+
+            if df_parts:
+                full_df = pd.concat(df_parts, ignore_index=True)
+                logging.info(f"For interval {interval} - Oldest candle: {full_df["DateTime"].iloc[0]} - Newest candle: {full_df["DateTime"].iloc[-1]}")
+                self.save_to_parquet(full_df, interval)  
+                df_parts.clear()
                     
     def to_dataframe(self, candles):
         candles_list = []
@@ -57,8 +66,8 @@ class candle_data_processor:
         df[columns_to_string] = df[columns_to_string].astype('string')
         return df
     
-    def save_to_parquet(self, df, interval, timestamp):
-        file_name = f"{interval}-{timestamp}.parquet"
+    def save_to_parquet(self, df, interval):
+        file_name = f"{interval}.parquet"
         file_path = os.path.join(self.output_path, file_name)
         df.to_parquet(file_path, index=False)   
         logging.info(f"Saved {len(df)} rows to {file_path}")

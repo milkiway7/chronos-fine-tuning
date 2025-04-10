@@ -15,9 +15,9 @@ class tech_indicators_data_processor:
         for interval in INTERVALS:
             indicators = await self.repository.get_tech_indicators_by_interval(interval)
             df = self.to_dataframe(indicators)
-            timestamp = df["CloseTime"].iloc[-1]
             df = self.transform_data(df)
-            self.save_to_parquet(df, interval, timestamp)
+            self.save_to_parquet(df, interval)
+
 
     def to_dataframe(self, indicators):
         indicators_list = []
@@ -40,8 +40,8 @@ class tech_indicators_data_processor:
         df[columns_to_string] = df[columns_to_string].astype('string')
         return df
     
-    def save_to_parquet(self, df, interval, timestamp):
-        file_name = f"{interval}-{timestamp}.parquet"
+    def save_to_parquet(self, df, interval):
+        file_name = f"{interval}.parquet"
         file_path = os.path.join(self.output_path, file_name)
         df.to_parquet(file_path, index=False)
         logging.info(f"Saved {len(df)} technical indicators data to {file_path}")
