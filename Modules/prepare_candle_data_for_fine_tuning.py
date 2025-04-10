@@ -1,4 +1,3 @@
-import time
 import pandas as pd
 import os
 import logging
@@ -8,8 +7,8 @@ from Database.Repositories.candles_repository import candles_repository
 INTERVALS = ["1m", "5m", "15m","30m","1h","4h","1d"]
 
 
-class DataProcessor:
-    def __init__(self, output_path = "data/parquet", batch_size = 50000):
+class candle_data_processor:
+    def __init__(self, output_path = "data/parquet/candles", batch_size = 50000):
         self.repository = candles_repository()
         self.output_path = output_path
         self.batch_size = batch_size
