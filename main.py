@@ -9,9 +9,9 @@ configure_logging()
 async def main():
     await initialize_database()
     candles_repository_instance = candles_repository()
-    
     processor = candle_data_processor(candles_repository_instance)
-    await processor.process_data()
+    async for df in processor.process_data():
+        print(df.head())
     # technical_processor = tech_indicators_data_processor()
     # await technical_processor.process_data()
 if __name__ == "__main__":
