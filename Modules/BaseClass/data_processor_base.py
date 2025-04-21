@@ -23,24 +23,19 @@ class data_processor_base(ABC):
     
     def transform_data(self, df):
         # add columns to indicate symbol and interval
-        columns_not_to_round = []
-
-        for symbol_name in self.symbols:
-            for interval_name in self.intervals:
-                df[symbol_name + "_" + interval_name] = 0
-                column_name = symbol_name + "_" + interval_name
-                df.loc[(df["Symbol"] == symbol_name) & (df["Interval"] == interval_name), column_name] = 1
-                columns_not_to_round.append(column_name)
-
+        columns_not_to_round = ["Symbol", "Interval"]
+        # chage timestamp to yyyy-mm-dd format and separate it into year, month, day, hour, minute
+        self.transform_timestamp(df)
         columns_to_round = [col for col in df.columns if col not in columns_not_to_round]
         df[columns_to_round] = df[columns_to_round].round(4)
-        df.drop(columns = ["CloseTime", "OpenTime","Id","Symbol","Interval"], inplace=True)   
+        df.drop(columns = ["CloseTime", "OpenTime","Id"], inplace=True)   
+        print(df.head())
         return df  
 
-
-
-        
-        
-        
-
-
+    def transform_timestamp(self,df):
+        df["CloseTime"] = pd.to_datetime(df["CloseTime"], unit='ms')
+        df["Year"] = df["CloseTime"].dt.year
+        df["Month"] = df["CloseTime"].dt.month
+        df["Day"] = df["CloseTime"].dt.day
+        df["Hour"] = df["CloseTime"].dt.hour
+        df["Minute"] = df["CloseTime"].dt.minute
