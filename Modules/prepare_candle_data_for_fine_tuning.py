@@ -26,5 +26,4 @@ class candle_data_processor(data_processor_base):
             if df_parts:
                 df_parts = pd.concat(df_parts, ignore_index=True)
                 yield df_parts
-                df_parts.clear()
                 

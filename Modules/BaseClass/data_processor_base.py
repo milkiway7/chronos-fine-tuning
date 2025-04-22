@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import pandas as pd
-
 from constants import CONSTANTS_GLOBAL
+
 class data_processor_base(ABC):
     def __init__(self,repository,bath_size = 50000):
         self.batch_size = bath_size
@@ -23,12 +23,14 @@ class data_processor_base(ABC):
     
     def transform_data(self, df):
         # add columns to indicate symbol and interval
-        columns_not_to_round = ["Symbol", "Interval"]
+        columns_not_to_round = ["Symbol", "Interval","Year", "Month", "Day", "Hour", "Minute"]
         # chage timestamp to yyyy-mm-dd format and separate it into year, month, day, hour, minute
         self.transform_timestamp(df)
-        columns_to_round = [col for col in df.columns if col not in columns_not_to_round]
-        df[columns_to_round] = df[columns_to_round].round(4)
         df.drop(columns = ["CloseTime", "OpenTime","Id"], inplace=True)   
+        columns_to_round = [col for col in df.columns if col not in columns_not_to_round]
+        for col in columns_to_round:
+            df[col] = pd.to_numeric(df[col], errors='coerce') 
+            df[columns_to_round] = df[columns_to_round].round(4)
         print(df.head())
         return df  
 

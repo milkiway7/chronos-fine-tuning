@@ -4,6 +4,7 @@ from logger_config import configure_logging
 from Modules.prepare_candle_data_for_fine_tuning import candle_data_processor
 from Modules.prepare_tech_indicators_data_fine_tuning import tech_indicators_data_processor
 from Database.Repositories.candles_repository import candles_repository
+from Modules.transform_to_tokens import transform_to_tokens
 configure_logging()
 
 async def main():
@@ -11,7 +12,11 @@ async def main():
     candles_repository_instance = candles_repository()
     processor = candle_data_processor(candles_repository_instance)
     async for df in processor.process_data():
-        print(df.head())
+        # change dataframe to token sequence
+        tokenizer = transform_to_tokens()
+        tokens = tokenizer.to_token_sequences(df)
+        a = 1
+        # add tokens to 
     # technical_processor = tech_indicators_data_processor()
     # await technical_processor.process_data()
 if __name__ == "__main__":
