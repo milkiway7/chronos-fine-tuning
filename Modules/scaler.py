@@ -15,7 +15,6 @@ class Scaler():
         os.makedirs(self.scaled_data_path, exist_ok=True)
     
     def scale(self):
-        scaled_dfs = []
         interval = self.df.iloc[0]["Interval"]
 
         for symbol in CONSTANTS_GLOBAL["symbol"]:
@@ -26,15 +25,19 @@ class Scaler():
             columns_to_scale = [col for col in df_symbol.columns if col not in columns_not_to_scale]
             # create scaler and scale data
             scaler = StandardScaler()
+            #tu już mam dane skalowane ale jeszcze nie zapisane to tak jakby gotowe danie
             df_symbol[columns_to_scale] = scaler.fit_transform(df_symbol[columns_to_scale])
-
-            with open(f"{self.scalers_path}/{interval}_{symbol}.pkl", "wb") as f:
+            self.scaled_df = df_symbol
+            # tu zapisuje scaler do pliku który jest przepisem na to danie potrzebuję tego aby potem odtworzyć to danie
+            with open(f"{self.scalers_path}/{symbol}_{interval}.pkl", "wb") as f:
                 pickle.dump(scaler, f)
-            # Dodajemy do listy wynikowej
-            scaled_dfs.append(df_symbol)
+            #zapisz skalowane dane do pliku grupując po interwale i symbolu
+            self.scaled_df.to_parquet(f"{self.scaled_data_path}/{symbol}_{interval}.paruquet")
+            print(f"{self.scaled_df.head()}")
+            print(f"{len(self.scaled_df)}")
 
-        self.scaled_df = pd.concat(scaled_dfs).reset_index(drop=True)
-        self.scaled_df.to_parquet(f"{self.scaled_data_path}/scaled_data_{interval}.paruquet")
+
+
             
 
 
