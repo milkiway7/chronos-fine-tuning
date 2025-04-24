@@ -14,7 +14,6 @@ async def main():
     async for df in processor.process_data():
         scaler = Scaler(df)
         scaler.scale()
-        a = df
 
         # add tokens to 
     # technical_processor = tech_indicators_data_processor()
